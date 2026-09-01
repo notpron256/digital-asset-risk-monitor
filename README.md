@@ -1,6 +1,6 @@
 # digital-asset-risk-monitor
 
-A proof-of-concept pre-transaction risk screening tool: simulated (or manually entered, real) outbound withdrawals and inbound deposits are screened against a real on-chain sanctions oracle — supporting Ethereum, Arbitrum, and BNB Smart Chain — plus a mock provenance score, then auto-cleared, routed to an ops manager, or routed to a compliance manager depending on risk tier. See [`intent/intent-001.md`](intent/intent-001.md) and [`spec/spec-001.md`](spec/spec-001.md) for the full design.
+A proof-of-concept pre-transaction risk screening tool: simulated (or manually entered, real) outbound withdrawals and inbound deposits are screened against a real on-chain sanctions oracle — supporting Ethereum, Arbitrum, and BNB Smart Chain — plus a mock provenance score, then auto-cleared, routed to an ops manager, or routed to a compliance manager depending on risk tier. See [`intent/intent-001.md`](intent/intent-001.md) and [`spec/spec-001.md`](spec/spec-001.md) for the full design. See [`REVIEW.md`](REVIEW.md) for the review policy applied to changes in this project.
 
 The app has two parts you run separately: `server` (Node/Express/TypeScript backend + Postgres) and `client` (React/TypeScript frontend, Vite).
 
