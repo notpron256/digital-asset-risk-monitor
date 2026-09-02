@@ -1,5 +1,7 @@
 # digital-asset-risk-monitor — Agent Instructions
 
+See [`REVIEW.md`](REVIEW.md) for the review policy applied to changes in this project, and [`MAINTAIN.md`](MAINTAIN.md) for the production monitoring this system would need if deployed for real (a design artifact — nothing in it is actually wired up).
+
 ## Project norms
 
 Specific lessons from building this project so far — not generic advice, each tied to something that actually happened in this repo.
