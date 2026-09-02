@@ -112,3 +112,33 @@ See `spec/spec-001.md`'s Areas of concern for the known limitations of this free
 
 - Backend: `4000` by default (`PORT` in `server/.env`).
 - Frontend: `5173` (Vite's default; not configured via `.env`).
+
+## Deployment
+
+This app is designed to deploy as: **backend on [Render](https://render.com)**, **frontend on [Vercel](https://vercel.com)**, **database on [Neon](https://neon.tech)** (already set up for local dev — the same instance can be reused). Deployment itself is done manually through each platform's dashboard; nothing here deploys automatically.
+
+### Backend (Render)
+
+- **Root directory**: `server`
+- **Build command**: `npm ci && npm run build`
+- **Start command**: `npm start` (runs the compiled `dist/server.js`, not the dev server)
+- **Environment variables** (set in Render's dashboard, under the service's Environment tab):
+  - `DATABASE_URL` — the Neon connection string.
+  - `CORS_ORIGIN` — the deployed Vercel frontend's URL (e.g. `https://your-app.vercel.app`). Comma-separate multiple values if you need to allow more than one (e.g. a production domain plus a Vercel preview URL). **Leave this set** in production — leaving it unset makes the API accept requests from any origin, which is only the right default for local dev.
+  - `RPC_URL` (or `RPC_URL_ETHEREUM`), `RPC_URL_ARBITRUM`, `RPC_URL_BSC` — optional, same as local dev. Leaving any of these unset runs that chain in stub mode.
+  - Do **not** set `PORT` manually — Render assigns it automatically, and the app already reads `process.env.PORT`.
+- Render will run a health check against the service; `GET /api/health` (already implemented) works for this.
+- Run `npm run migrate` once against the Neon database before first use, if you haven't already (from your local machine with `DATABASE_URL` pointed at it works fine — the migration doesn't need to run on Render itself).
+
+### Frontend (Vercel)
+
+- **Root directory**: `client`
+- **Build command**: `npm run build` (Vite's default)
+- **Output directory**: `dist` (Vite's default)
+- **Environment variable** (set in Vercel's dashboard, under the project's Environment Variables): `VITE_API_BASE_URL` — the deployed Render backend's URL (e.g. `https://your-app.onrender.com`). This must be set **before building** — Vite bakes `VITE_`-prefixed variables into the built JavaScript at build time, it does not read them at runtime, so changing it later requires a rebuild/redeploy, not just an env var update.
+
+### After deploying
+
+Render and Vercel will each generate a URL before the other side knows about it, so there's an unavoidable order-of-operations step: deploy the backend first, note its Render URL, set that as `VITE_API_BASE_URL` in Vercel and deploy the frontend, note *its* Vercel URL, then go back and set that as `CORS_ORIGIN` in Render and redeploy (or manually restart) the backend so CORS actually accepts it.
+
+To verify: open the deployed frontend and confirm the dashboard loads transactions with no "Failed to fetch" or CORS errors in the browser console — that specific failure mode means either `VITE_API_BASE_URL` is wrong/missing, or `CORS_ORIGIN` on the backend doesn't (yet) match the frontend's real URL.
