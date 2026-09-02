@@ -28,7 +28,6 @@ export interface TransactionSummary {
   direction: "outbound" | "inbound";
   address: string;
   staging_address: string | null;
-  amount: string;
   asset: string;
   chain: string;
   state: string;
@@ -59,7 +58,6 @@ export interface TransactionRow {
   direction: "outbound" | "inbound";
   address: string;
   staging_address: string | null;
-  amount: string;
   asset: string;
   chain: string;
   state: string;
@@ -107,7 +105,6 @@ export interface SimulateParams {
   forceTier?: "low" | "medium" | "high" | "";
   forceSanctionsHit?: boolean;
   address?: string;
-  amount?: string;
   chain?: string;
 }
 

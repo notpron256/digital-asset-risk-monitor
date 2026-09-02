@@ -43,6 +43,7 @@ export function Dashboard({ transactions, loading, error, onSelect }: DashboardP
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
+              <th style={{ padding: "6px 8px" }}>ID</th>
               <th style={{ padding: "6px 8px" }}>Direction</th>
               <th style={{ padding: "6px 8px" }}>Chain</th>
               <th style={{ padding: "6px 8px" }}>Address</th>
@@ -61,6 +62,9 @@ export function Dashboard({ transactions, loading, error, onSelect }: DashboardP
                 onClick={() => onSelect(tx.id)}
                 style={{ borderBottom: "1px solid #eee", cursor: "pointer" }}
               >
+                <td style={{ padding: "6px 8px", fontFamily: "monospace", fontSize: 12 }} title={tx.id}>
+                  {tx.id.slice(0, 8)}…
+                </td>
                 <td style={{ padding: "6px 8px" }}>{tx.direction}</td>
                 <td style={{ padding: "6px 8px" }}>{CHAIN_LABELS[tx.chain] ?? tx.chain}</td>
                 <td style={{ padding: "6px 8px", fontFamily: "monospace", fontSize: 12 }}>

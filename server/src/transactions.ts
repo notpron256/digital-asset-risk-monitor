@@ -9,10 +9,6 @@ function randomAddress(): string {
   return "0x" + randomBytes(20).toString("hex");
 }
 
-function randomAmount(): string {
-  return (Math.random() * 0.49 + 0.01).toFixed(4);
-}
-
 const ASSET_FOR_CHAIN: Record<ChainKey, string> = {
   ethereum: "ETH",
   arbitrum: "ETH",
@@ -23,12 +19,10 @@ export interface SimulateOptions {
   forceTier?: Tier;
   forceSanctionsHit?: boolean;
   address?: string;
-  amount?: string;
   chain?: string;
 }
 
 const ADDRESS_PATTERN = /^0x[0-9a-f]{40}$/;
-const AMOUNT_PATTERN = /^\d+(\.\d+)?$/;
 
 function resolveChain(input: string | undefined): ChainKey {
   if (!input) return "ethereum";
@@ -48,17 +42,6 @@ function resolveAddress(override: string | undefined): string {
   if (!trimmed) return randomAddress();
   if (!ADDRESS_PATTERN.test(trimmed)) {
     throw new Error(`Invalid address: '${override}'. Expected 0x followed by 40 hex characters.`);
-  }
-  return trimmed;
-}
-
-// Manual-entry mode passes a real amount for a real transaction the user is
-// about to make (or has received) via MetaMask — not a random mock value.
-function resolveAmount(override: string | undefined): string {
-  if (override === undefined) return randomAmount();
-  const trimmed = override.trim();
-  if (!AMOUNT_PATTERN.test(trimmed) || Number(trimmed) <= 0) {
-    throw new Error(`Invalid amount: '${override}'. Expected a positive decimal number.`);
   }
   return trimmed;
 }
@@ -88,14 +71,13 @@ async function insertScreeningResult(
 
 export async function submitOutbound(submittedBy: string, opts: SimulateOptions = {}): Promise<string> {
   const address = resolveAddress(opts.address);
-  const amount = resolveAmount(opts.amount);
   const chain = resolveChain(opts.chain);
 
   const inserted = await pool.query(
-    `INSERT INTO transactions (direction, address, amount, asset, state, submitted_by, chain)
-     VALUES ('outbound', $1, $2, $3, $4, $5, $6)
+    `INSERT INTO transactions (direction, address, asset, state, submitted_by, chain)
+     VALUES ('outbound', $1, $2, $3, $4, $5)
      RETURNING id`,
-    [address, amount, ASSET_FOR_CHAIN[chain], initialState("outbound"), submittedBy, chain],
+    [address, ASSET_FOR_CHAIN[chain], initialState("outbound"), submittedBy, chain],
   );
   const transactionId: string = inserted.rows[0].id;
 
@@ -115,14 +97,13 @@ export async function submitOutbound(submittedBy: string, opts: SimulateOptions 
 export async function receiveInbound(opts: SimulateOptions = {}): Promise<string> {
   const sourceAddress = resolveAddress(opts.address);
   const stagingAddress = randomAddress();
-  const amount = resolveAmount(opts.amount);
   const chain = resolveChain(opts.chain);
 
   const inserted = await pool.query(
-    `INSERT INTO transactions (direction, address, staging_address, amount, asset, state, chain)
-     VALUES ('inbound', $1, $2, $3, $4, $5, $6)
+    `INSERT INTO transactions (direction, address, staging_address, asset, state, chain)
+     VALUES ('inbound', $1, $2, $3, $4, $5)
      RETURNING id`,
-    [sourceAddress, stagingAddress, amount, ASSET_FOR_CHAIN[chain], initialState("inbound"), chain],
+    [sourceAddress, stagingAddress, ASSET_FOR_CHAIN[chain], initialState("inbound"), chain],
   );
   const transactionId: string = inserted.rows[0].id;
 

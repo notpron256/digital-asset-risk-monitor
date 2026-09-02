@@ -131,6 +131,10 @@ export function TransactionDetail({
       <table style={{ fontSize: 13, marginBottom: 16 }}>
         <tbody>
           <tr>
+            <td style={{ color: "#666", paddingRight: 12 }}>ID</td>
+            <td style={{ fontFamily: "monospace", fontSize: 12 }}>{transaction.id}</td>
+          </tr>
+          <tr>
             <td style={{ color: "#666", paddingRight: 12 }}>Direction</td>
             <td>{transaction.direction}</td>
           </tr>
@@ -141,12 +145,6 @@ export function TransactionDetail({
           <tr>
             <td style={{ color: "#666", paddingRight: 12 }}>Address</td>
             <td style={{ fontFamily: "monospace" }}>{transaction.address}</td>
-          </tr>
-          <tr>
-            <td style={{ color: "#666", paddingRight: 12 }}>Amount</td>
-            <td>
-              {transaction.amount} {transaction.asset}
-            </td>
           </tr>
           <tr>
             <td style={{ color: "#666", paddingRight: 12 }}>State</td>

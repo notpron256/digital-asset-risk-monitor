@@ -8,7 +8,7 @@ export const transactionsRouter = Router();
 transactionsRouter.get("/", async (_req, res) => {
   const result = await pool.query(`
     SELECT
-      t.id, t.direction, t.address, t.staging_address, t.amount, t.asset, t.chain,
+      t.id, t.direction, t.address, t.staging_address, t.asset, t.chain,
       t.state, t.reviewer_role, t.submitted_by, t.created_at, t.updated_at,
       sr.tier, sr.sanctions_hit, sr.mock_score, sr.chainalysis_mode, sr.cache_hit,
       esc.actor_name AS escalated_by,
