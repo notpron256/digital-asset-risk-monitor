@@ -18,13 +18,15 @@ Before calling any change to the screening/review/state-machine logic done, run 
 cd server && npm test
 ```
 
-This runs Node's built-in test runner (via `tsx`, already a project dependency — no new packages needed) against every `*.test.ts` file in `server/src`. It currently covers:
+This runs Node's built-in test runner (via `tsx`, already a project dependency — no new packages needed). `package.json`'s `test` script names the test files **explicitly** (`src/scoring.test.ts src/stateMachine.test.ts`), not a `**/*.test.ts` glob — that glob was tried first and silently broke in CI: no shell here (`/bin/sh`, `bash` without `globstar`, GitHub Actions' `bash`) actually expands `**`, and whether that even matters depends on the Node version — Node's native `--test` glob-argument support only exists from v21+, and its no-argument auto-discovery only recognizes `.test.ts` files from a later version too, so a version pinned below that (this project's CI pins Node 20) can silently run **zero tests** and still exit 0. **Since test files are listed explicitly, add any new `*.test.ts` file to this line in `server/package.json` by hand** — it will not be picked up automatically.
+
+It currently covers:
 
 - **Risk-tier boundary routing** (`scoring.test.ts`) — exact 0–35 / 36–65 / 66–100 boundaries for low/medium/high, including the boundary values themselves (35 vs 36, 65 vs 66).
 - **Four-eyes enforcement** (`stateMachine.test.ts`) — a reviewer cannot approve/escalate their own outbound submission; correctly does *not* apply to inbound (no human submitter to conflict with).
 - **State machine transitions** (`stateMachine.test.ts`) — `submitted`/`received` → `screening` → `reviewing`/`settled` outcomes for each tier, plus that invalid actions (an ops manager rejecting, a compliance manager escalating) are rejected, not silently allowed.
 
-A change to `stateMachine.ts`, `scoring.ts`, or the four-eyes check in `transactions.ts` isn't done until `npm test` exits 0 with `fail: 0`. A red test blocks the change — fix the code or the test, don't ignore it.
+A change to `stateMachine.ts`, `scoring.ts`, or the four-eyes check in `transactions.ts` isn't done until `npm test` exits 0 with `fail: 0` **and a nonzero test count** — a run reporting 0 tests is not a pass. A red test blocks the change — fix the code or the test, don't ignore it. CI (`.github/workflows/test.yml`) runs the same command on every push/PR to `main`.
 
 ### Eval suite: judgment under ambiguity and risk
 

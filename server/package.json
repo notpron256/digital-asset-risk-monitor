@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "migrate": "tsx src/migrate.ts",
-    "test": "node --import tsx --test src/**/*.test.ts",
+    "test": "node --import tsx --test src/scoring.test.ts src/stateMachine.test.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js"
   },
